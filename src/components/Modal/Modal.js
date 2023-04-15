@@ -19,11 +19,9 @@ const Modal = ({ image, onClose }) => {
 
 Modal.propTypes = {
   onClose: PropTypes.func.isRequired,
-  images: PropTypes.arrayOf(
-      PropTypes.shape({
+  image: PropTypes.shape({
           largeImageURL: PropTypes.string.isRequired,
           tags: PropTypes.string.isRequired,
     }) 
-  )
 }
 export default Modal;

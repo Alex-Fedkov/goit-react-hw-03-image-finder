@@ -19,17 +19,17 @@ class App extends Component {
     showImageId: null,
   }
 
-  componentDidMount(){
-    document.addEventListener("keydown", this.escFunction, false);
-  }
-
-  componentWillUnmount(){
-    document.removeEventListener("keydown", this.escFunction, false);
-  }
-
   componentDidUpdate(_, prevState) {
-    if (prevState.searchQuery !== this.state.searchQuery) {
+    if (prevState.searchQuery !== this.state.searchQuery || prevState.currentPage !== this.state.currentPage) {
       this.getPictures();
+    }
+
+    if (!prevState.showImageId && this.state.showImageId) {
+      document.addEventListener("keydown", this.escFunction, false);
+    }
+
+    if (prevState.showImageId && !this.state.showImageId) {
+      document.removeEventListener("keydown", this.escFunction, false);
     }
   }
 
@@ -44,8 +44,7 @@ class App extends Component {
         throw new Error(response.statusText);
       }
 
-      this.setState(prevState => ({ 
-        currentPage: prevState.currentPage + 1,
+      this.setState(prevState => ({
         totalPages: Math.ceil(response.data.totalHits / PICTURES_IN_PAGE),
         images: [ ...prevState.images, ...response.data.hits]
       }));
@@ -54,6 +53,9 @@ class App extends Component {
   
 
   onSubmitSearch = (searchQuery) => {
+    if (this.state.searchQuery === searchQuery) {
+      return;
+    }
     this.setState({ 
       searchQuery,
       images: [],
@@ -80,6 +82,10 @@ class App extends Component {
     }
   }
 
+  onLoadMore = () => {
+    this.setState(prevState => ({ currentPage: prevState.currentPage += 1 }));
+  }
+
   render () {
     const { images, isLoading, currentPage, totalPages, showImageId } = this.state;
     const image = images.find(({ id }) => id === showImageId);
@@ -87,7 +93,7 @@ class App extends Component {
       <div>
         <Searchbar onSubmit={this.onSubmitSearch} />
         <ImageGallery images={images} onImageClick={this.onImageClick} />
-        {!isLoading && currentPage < totalPages && <Button onClick={this.getPictures} />}
+        {!isLoading && currentPage < totalPages && <Button onClick={this.onLoadMore} />}
         {isLoading && <Loader />}
         {showImageId && <Modal image={image} onClose={this.onCloseModal} />}
       </div>
