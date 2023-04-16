@@ -21,20 +21,7 @@ class App extends Component {
 
   componentDidUpdate(_, prevState) {
     if (prevState.searchQuery !== this.state.searchQuery || prevState.currentPage !== this.state.currentPage) {
-      this.getPictures();
-    }
-
-    if (!prevState.showImageId && this.state.showImageId) {
-      document.addEventListener("keydown", this.escFunction, false);
-    }
-
-    if (prevState.showImageId && !this.state.showImageId) {
-      document.removeEventListener("keydown", this.escFunction, false);
-    }
-  }
-
-  getPictures = () => {
-    this.setState({ isLoading: true });
+      this.setState({ isLoading: true });
 
     // const images = await fetchPictures(searchQuery);
     const url = `https://pixabay.com/api/?q=${this.state.searchQuery}&page=${this.state.currentPage}&key=${ApiKey}&image_type=photo&orientation=horizontal&per_page=${PICTURES_IN_PAGE}`;
@@ -49,9 +36,35 @@ class App extends Component {
         images: [ ...prevState.images, ...response.data.hits]
       }));
     }).finally(() => this.setState({ isLoading: false }));
-  }
-  
+    }
 
+    if (!prevState.showImageId && this.state.showImageId) {
+      document.addEventListener("keydown", this.escFunction, false);
+    }
+
+    if (prevState.showImageId && !this.state.showImageId) {
+      document.removeEventListener("keydown", this.escFunction, false);
+    }
+  }
+
+  // getPictures = () => {
+  //   this.setState({ isLoading: true });
+
+  //   // const images = await fetchPictures(searchQuery);
+  //   const url = `https://pixabay.com/api/?q=${this.state.searchQuery}&page=${this.state.currentPage}&key=${ApiKey}&image_type=photo&orientation=horizontal&per_page=${PICTURES_IN_PAGE}`;
+  //   axios(url).then(response => {
+  //     //console.log('response', response);
+  //     if (response.status !== 200) {
+  //       throw new Error(response.statusText);
+  //     }
+
+  //     this.setState(prevState => ({
+  //       totalPages: Math.ceil(response.data.totalHits / PICTURES_IN_PAGE),
+  //       images: [ ...prevState.images, ...response.data.hits]
+  //     }));
+  //   }).finally(() => this.setState({ isLoading: false }));
+  // }
+ 
   onSubmitSearch = (searchQuery) => {
     if (this.state.searchQuery === searchQuery) {
       return;
@@ -83,7 +96,7 @@ class App extends Component {
   }
 
   onLoadMore = () => {
-    this.setState(prevState => ({ currentPage: prevState.currentPage += 1 }));
+    this.setState(prevState => ({ currentPage: prevState.currentPage + 1 }));
   }
 
   render () {
